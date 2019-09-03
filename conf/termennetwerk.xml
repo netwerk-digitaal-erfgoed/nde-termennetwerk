@@ -117,6 +117,11 @@
         <nde:order>geonames,tgn,bag,kloeke</nde:order>
         <nde:wildcard>no</nde:wildcard>
     </nde:dataset>
+    <nde:dataset id="geonames" recipe="nl.knaw.huc.di.nde.recipe.GeoNames">
+        <nde:label xml:lang="nl">The GeoNames geographical database covers all countries and contains over eleven million placenames</nde:label>
+        <nde:api>http://api.geonames.org/</nde:api>
+        <nde:user>beng_dera</nde:user>
+    </nde:dataset>
     <nde:dataset id="adamlink" recipe="nl.knaw.huc.di.nde.recipe.SparqlEndpoint">
         <nde:label xml:lang="nl">Referentiedata voor Amsterdamse collecties (AdamLink) </nde:label>
         <nde:api>https://api.druid.datalegend.net/datasets/adamnet/all/services/endpoint/sparql</nde:api>
