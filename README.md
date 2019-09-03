@@ -21,6 +21,11 @@ $ docker run --rm -it -p 8080:8080 nde-termennetwerk
 ## Endpoints
 
 1. [GraphQL](https://graphql.org/) endpoint: http://localhost:8080/nde/graphql
+	POST your query to this endpoint. The query itself should be the string value of the 'query' property in 
+	a JSON object - e.g. 
+	
+	```{"query": "{ terms(match:\"*fietsen*\" dataset:[\"gtaa\",\"wikidata\"]) { dataset terms {uri prefLabel altLabel} }}"}```
+	
 2. [GraphiQL](https://github.com/graphql/graphiql) endpoint: http://localhost:8080/static/graphiql/index.html
 
 ## Queries

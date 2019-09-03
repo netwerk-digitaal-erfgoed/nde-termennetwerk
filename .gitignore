@@ -28,3 +28,14 @@ nbactions.xml
 /target/
 bin/.project
 do.sh
+.idea/encodings.xml
+.idea/misc.xml
+.idea/modules.xml
+.idea/nde-termennetwerk.iml
+.idea/workspace.xml
+/bin/
+.idea/vcs.xml
+.project
+.classpath
+.settings/org.eclipse.core.resources.prefs
+.settings/org.eclipse.jdt.core.prefs
