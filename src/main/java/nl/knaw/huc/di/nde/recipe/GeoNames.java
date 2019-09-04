@@ -29,12 +29,6 @@ import java.net.URLEncoder;
 import java.util.Scanner;
 import org.json.*;
 
-//Potentially interesting web services
-
-//http://www.geonames.org/export/place-hierarchy.html#children
-//http://www.geonames.org/export/place-hierarchy.html#contains
-//http://www.geonames.org/export/place-hierarchy.html#hierarchy
-//http://www.geonames.org/export/geonames-search.html
 
 public class GeoNames implements RecipeInterface {
 	
@@ -43,6 +37,7 @@ public class GeoNames implements RecipeInterface {
     static {
         NAMESPACES.putAll(Registry.NAMESPACES);
         NAMESPACES.put("gn", "http://www.geonames.org/ontology#");
+        NAMESPACES.put("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
     };
     
     
@@ -69,35 +64,80 @@ public class GeoNames implements RecipeInterface {
         return json;
     }
 
-    // function translating the results into GraphQL Term vars
-    private static TermDTO processItem(JSONObject itemObject, TermDTO term, String base) {
+    
+    private static List<TermDTO> processItems(Iterator<XdmItem> iter, List<TermDTO> terms)
+    {
+    	System.err.println("processing***");
+        while (iter.hasNext()) {
+        	System.err.println("looping");
+        	TermDTO term = null;
+        	try
+        	{
+        		
+            XdmItem item = iter.next();
+            term = new TermDTO();
+            term.uri = new URI(Saxon.xpath2string(item, "@rdf:about", null, GeoNames.NAMESPACES));
+            // properties
+            for (Iterator<XdmItem> lblIter = Saxon.xpathIterator(item, "gn:name",null, GeoNames.NAMESPACES); lblIter.hasNext();) {
+                term.prefLabel.add(lblIter.next().getStringValue());
+            }
 
-        String name =""; String uristr = ""; String id = ""; 
-        try {
-            if (itemObject.has("name")) { name = itemObject.getString("name"); }
-            if (itemObject.has("uri")) { uristr = itemObject.getString("uri"); }
-            if (itemObject.has("id")) { uristr = itemObject.getString("id"); }
-            if ( !uristr.toLowerCase().contains("http") ) {
-                // build a uri based on the erfgeo url in 'base'
-                uristr = base + uristr; 
+            for (Iterator<XdmItem> lblIter = Saxon.xpathIterator(item, "gn:alternateName",null, GeoNames.NAMESPACES); lblIter.hasNext();) {
+                XdmItem altNameItem = lblIter.next();
+            	String lang = Saxon.xpath2string(altNameItem, "@xml:lang", null, GeoNames.NAMESPACES);
+            	//only show alt names in Dutch or English
+            	if(lang.equalsIgnoreCase("nl")|| lang.equalsIgnoreCase("en"))
+            	{
+                	term.altLabel.add(altNameItem.getStringValue());
+            	}
+            }            
+ 
+            //also need to pick up official names, as official names in other languages are not as alternateName but official name
+            for (Iterator<XdmItem> lblIter = Saxon.xpathIterator(item, "gn:officialName",null, GeoNames.NAMESPACES); lblIter.hasNext();) {
+                XdmItem altNameItem = lblIter.next();
+            	String lang = Saxon.xpath2string(altNameItem, "@xml:lang", null, GeoNames.NAMESPACES);
+
+            	//only show official names in Dutch or English
+            	if(lang.equalsIgnoreCase("nl")|| lang.equalsIgnoreCase("en"))
+            	{
+                	term.altLabel.add(altNameItem.getStringValue());
+            	}
+            } 
+            
+            for (Iterator<XdmItem> lblIter = Saxon.xpathIterator(item, "gn:parentCountry",null, GeoNames.NAMESPACES); lblIter.hasNext();) {
+                XdmItem countryItem = lblIter.next();
+            	URI countryUri = new URI(Saxon.xpath2string(countryItem, "@rdf:resource", null, GeoNames.NAMESPACES));
+                XdmNode countryRes = Saxon.buildDocument(new StreamSource(countryUri.toString() + "about.rdf"));
+                Iterator<XdmItem> countryNameIter = Saxon.xpathIterator(countryRes, "/rdf:RDF/gn:Feature/gn:name",null, GeoNames.NAMESPACES);
+                while(countryNameIter.hasNext())
+                {
+                	RefDTO parentCountry = new RefDTO();
+                	parentCountry.url = countryUri.toString();
+                	parentCountry.label = countryNameIter.next().getStringValue();
+                	term.related.add(parentCountry);
+                }
             }
-            // first start with uri and prefLabel
-            if (term.uri == null ) {
-                term.uri= new URI(uristr);
-                term.prefLabel.add(name);
+            
+            //misusing the definition property here for links to the wikipedia and dbpedia articles
+            //need to consider a better alternative if we decide this information is worth displaying
+            //possibly subclassing TermDTO??
+            for (Iterator<XdmItem> lblIter = Saxon.xpathIterator(item, "gn:wikipediaArticle",null, GeoNames.NAMESPACES); lblIter.hasNext();) {
+                XdmItem articleItem = lblIter.next();
+            	term.definition.add(Saxon.xpath2string(articleItem, "@rdf:resource", null, GeoNames.NAMESPACES));
             }
-            // all the others are added as related terms
-            else {
-                RefDTO ref = new RefDTO();
-                ref.label=name;
-                ref.url=uristr;
-                term.related.add(ref);
+            for (Iterator<XdmItem> lblIter = Saxon.xpathIterator(item, "rdfs:seeAlso",null, GeoNames.NAMESPACES); lblIter.hasNext();) {
+                XdmItem articleItem = lblIter.next();
+            	term.definition.add(Saxon.xpath2string(articleItem, "@rdf:resource", null, GeoNames.NAMESPACES));
+            }	
+
+            terms.add(term);
+        	}
+        	catch (SaxonApiException | URISyntaxException ex) {
+                Logger.getLogger(GeoNames.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }
-        catch (URISyntaxException ex) {
-            Logger.getLogger(GeoNames.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return term;
+    }
+        System.err.println("processed");
+        return terms;
     }
 
     @Override
@@ -123,30 +163,50 @@ public class GeoNames implements RecipeInterface {
             System.err.println("DBG: - api["+api+"]");
             System.err.println("DBG: - match["+match+"]");
 
-            URL url = new URL(api + "search?name="+  match + "&username=" + user + "&type=rdf");
+            //NOTE: there is a version of the API that returns JSON, but that doesn't then return the RDF identifier
+            //we specify:
+            // - results in RDF
+            // - return Dutch label for the main name
+            // - search only for populated places and independent political entities http://www.geonames.org/export/codes.html
+            // - search in Dutch labels (mainly to avoid searching in pseudo-languages such as airline codes)
+            
+            //first for the specified feature classes
+            //populated places and country/state/region
+            URL url = new URL(api + "search?name="+  match + "&username=" + user + "&type=rdf&lang=nl&featureClass=P&featureClass=A&searchlang=nl");
             System.err.println("DBG: = url["+url+"]");
-
-            TermDTO term = null;
             XdmNode res = Saxon.buildDocument(new StreamSource(url.toString()));
-            System.err.println(res);
-            for (Iterator<XdmItem> iter = Saxon.xpathIterator(res, "/rdf:RDF/gn:Feature",null, GeoNames.NAMESPACES); iter.hasNext();) {
-            	System.err.println("here");
-                XdmItem item = iter.next();
-                System.err.println(item);
-                term = new TermDTO();
-                term.uri = new URI(Saxon.xpath2string(item, "@rdf:about", null, GeoNames.NAMESPACES));
-                // properties
-                for (Iterator<XdmItem> lblIter = Saxon.xpathIterator(item, "gn:name",null, GeoNames.NAMESPACES); lblIter.hasNext();) {
-                    term.prefLabel.add(lblIter.next().getStringValue());
-                }
-                for (Iterator<XdmItem> lblIter = Saxon.xpathIterator(item, "gn:alternateName",null, GeoNames.NAMESPACES); lblIter.hasNext();) {
-                    term.altLabel.add(lblIter.next().getStringValue());
-                }
+            Iterator<XdmItem> iter = Saxon.xpathIterator(res, "/rdf:RDF/gn:Feature",null, GeoNames.NAMESPACES);
+           
+            processItems(iter, terms);          
+ 
+            //then for specified feature codes (can't do both at the same time)
+            //roads, airports, theatres (for now as demo)
+            url = new URL(api + "search?name="+  match + "&username=" + user + "&type=rdf&lang=nl&featureCode=RD&featureCode=AIRP&featureCode=THTR&searchlang=nl");
+            System.err.println("DBG: = url["+url+"]");
+            res = Saxon.buildDocument(new StreamSource(url.toString()));
+            iter = Saxon.xpathIterator(res, "/rdf:RDF/gn:Feature",null, GeoNames.NAMESPACES);
+           
+            processItems(iter, terms); 
+            
+            if(terms.isEmpty()) {
+            	// try again without the search language specified - not the preference as this also returns matches on airport codes
+            	System.err.println("No results, trying again without search language");
+                url = new URL(api + "search?name="+  match + "&username=" + user + "&type=rdf&lang=nl&featureClass=P&featureClass=PCLI");
+                System.err.println("DBG: = url["+url+"]");
+                res = Saxon.buildDocument(new StreamSource(url.toString()));
+                iter = Saxon.xpathIterator(res, "/rdf:RDF/gn:Feature",null, GeoNames.NAMESPACES);
+                processItems(iter, terms);
                 
-                terms.add(term);
+                url = new URL(api + "search?name="+  match + "&username=" + user + "&type=rdf&lang=nl&featureCode=RD&featureCode=AIRP&featureCode=THTR&searchlang=nl");
+                System.err.println("DBG: = url["+url+"]");
+                res = Saxon.buildDocument(new StreamSource(url.toString()));
+                iter = Saxon.xpathIterator(res, "/rdf:RDF/gn:Feature",null, GeoNames.NAMESPACES);
+               
+                processItems(iter, terms); 
             }
+
              
-        } catch (IOException | SaxonApiException | URISyntaxException ex) {
+        } catch (IOException | SaxonApiException ex) {
             Logger.getLogger(GeoNames.class.getName()).log(Level.SEVERE, null, ex);
         }
         return terms;
