@@ -37,7 +37,7 @@ podTemplate(label: 'jenkins-slave', containers: [
             }
         }
 
-        stage('Automatical deploy to kubernetes') {
+        stage('Deploy to kubernetes') {
             container('kubectl') {
                 dir('nde-termennetwerk/') {
                     sh 'kubectl apply -f k8s'
