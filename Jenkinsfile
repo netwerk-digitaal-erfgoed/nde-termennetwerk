@@ -25,7 +25,7 @@ podTemplate(label: 'jenkins-slave', containers: [
 
         stage('Docker Build & Push') {
             container('docker') {
-                dir('stories/') {
+                dir('nde-termennetwerk/') {
                     withVault([configuration: configuration, vaultSecrets: secrets]) {
                         sh 'docker login harbor.51-105-200-91.nip.io/nde -u $DOCKER_USR -p $DOCKER_PSW'
                         sh 'docker build . -t harbor.51-105-200-91.nip.io/nde/nde-termennetwerk'
@@ -37,7 +37,7 @@ podTemplate(label: 'jenkins-slave', containers: [
 
         stage('Automatical deploy to kubernetes') {
             container('kubectl') {
-                dir('stories/') {
+                dir('nde-termennetwerk/') {
                     sh 'kubectl apply -f k8s'
                 }
             }
