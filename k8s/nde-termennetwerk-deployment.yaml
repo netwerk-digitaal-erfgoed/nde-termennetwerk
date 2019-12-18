@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: nde-termennetwerk
-          image: clariahacr.azurecr.io/nde-termennetwerk:latest
+          image: harbor.51-105-200-91.nip.io/nde/nde-termennetwerk:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
@@ -28,7 +28,7 @@ spec:
               cpu: 10m
               memory: 300Mi
       imagePullSecrets:
-        - name: dockercreds
+        - name: harbor-cred
 
 ---
 apiVersion: v1
