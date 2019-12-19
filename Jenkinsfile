@@ -17,11 +17,11 @@ podTemplate(label: 'jenkins-slave', containers: [
         def configuration = [vaultUrl: 'http://vault-helm.default.svc.cluster.local:8200',
                             vaultCredentialId: 'c64b32ee-4891-44ca-b151-42caea9856bc', engineVersion: 1]
 
-        git url: 'https://github.com/samleeflang/nde-termennetwerk.git', branch: 'master'
+        git url: 'https://github.com/netwerk-digitaal-erfgoed/nde-termennetwerk.git', branch: 'master'
 
         stage('Clone repository') {
             container('git') {
-                sh 'git clone -b master  https://github.com/samleeflang/nde-termennetwerk'
+                sh 'git clone -b master  https://github.com/netwerk-digitaal-erfgoed/nde-termennetwerk'
             }
         }
 
