@@ -41,6 +41,7 @@ podTemplate(label: 'jenkins-slave', containers: [
             container('kubectl') {
                 dir('nde-termennetwerk/') {
                     sh 'kubectl apply -f k8s'
+                    sh 'kubectl delete pod -l app=nde-termennetwerk'
                 }
             }
         }
