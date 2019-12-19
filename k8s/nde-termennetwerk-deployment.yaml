@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nde-termennetwerk-deployment
+  namespace: default
+  labels:
+    app: nde-termennetwerk
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nde-termennetwerk
+  template:
+    metadata:
+      labels:
+        app: nde-termennetwerk
+    spec:
+      containers:
+        - name: nde-termennetwerk
+          image: harbor.51-105-200-91.nip.io/nde/nde-termennetwerk:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          resources:
+            limits:
+              memory: 500Mi
+            requests:
+              cpu: 10m
+              memory: 300Mi
+      imagePullSecrets:
+        - name: harbor-cred
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nde-termennetwerk-service
+  namespace: default
+spec:
+  selector:
+    app: nde-termennetwerk
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080

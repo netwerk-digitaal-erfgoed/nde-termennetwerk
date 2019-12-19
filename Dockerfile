@@ -1,4 +1,4 @@
-FROM maven:3-jdk-8
+FROM maven:3-jdk-8-slim
 
 RUN mkdir -p /app/nde-termennetwerk
 ADD conf /app/nde-termennetwerk/conf
