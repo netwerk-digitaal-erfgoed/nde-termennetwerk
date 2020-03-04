@@ -30,127 +30,224 @@ The GraphiQL endpoint is hardwired to the NDE Termennetwerk GraphQL endpoint and
 Example queries:
 
 ```graphql
-query { terms(match:"*Dutch*",dataset:["clavas"]) { dataset terms {uri, prefLabel} } }
-```
-
-```graphql
-# Example: Gemeenschappelijke Thesaurus Audiovisuele Archieven (GTAA) en Wikidata
+# Clavas
 query {
-  terms(match:"*fietsen*" dataset:["gtaa","wikidata"]) { dataset terms {uri prefLabel altLabel} }
+  terms(match:"*Dutch*" dataset:["clavas"]) {
+    dataset
+    terms {
+      uri
+      prefLabel
+    }
+  }
 }
-```
 
-```graphql
-# Example: Nederlandse Thesaurus van Auteursnamen (NTA)
+# Gemeenschappelijke Thesaurus Audiovisuele Archieven (GTAA) and Wikidata
+query {
+  terms(match:"*fietsen*" dataset:["gtaa","wikidata"]) {
+    dataset
+    terms {
+      uri
+      prefLabel
+      altLabel
+    }
+  }
+}
+
+# Nederlandse Thesaurus van Auteursnamen (NTA)
 query {
   terms(match:"wolkers" dataset:["nta"] ) {
-    dataset label terms { uri prefLabel altLabel definition scopeNote }
+    dataset
+    label
+    terms {
+      uri
+      prefLabel
+      altLabel
+      definition
+      scopeNote
+    }
   }
 }
-```
 
-```graphql
-# Example: Cultuurhistorische Thesaurus (CHT) en Volkenkundige Thesaurus (SVCN)
+# Cultuurhistorische Thesaurus (CHT) and Volkenkundige Thesaurus (SVCN)
 query {
   terms(match:"amerika" dataset:["cht","svcn"]) {
-    dataset terms {uri prefLabel altLabel scopeNote}
+    dataset
+    terms {
+      uri
+      prefLabel
+      altLabel
+      scopeNote
+    }
   }
 }
-```
-```graphql
-# Example: WO2 Thesaurus
+
+# WO2 Thesaurus
 query {
   terms(match:"bezetting" dataset:["wo2"] ) {
-    dataset label terms { uri prefLabel altLabel definition scopeNote }
+    dataset
+    label
+    terms {
+      uri
+      prefLabel
+      altLabel
+      definition
+      scopeNote
+    }
   }
 }
-```
-```graphql
-# Example: AAT Thesaurus
+
+# AAT
 query {
   terms(match:"wiel*" dataset:["aat"] ) {
-    dataset label terms { uri prefLabel altLabel definition scopeNote }
-  }
-}
-```
-```graphql
-# Example: Stichting Omroep Muziek Termen
-query {
-  terms(match:"cello" dataset:["som"] ) {
-    dataset label terms { uri prefLabel scopeNote }
-  }
-}
-```
-```graphql
-# Example: Stichting Omroep Muziek Termen
-query {
-  terms(match:"cello" dataset:["som"] ) {
-    dataset label terms { uri prefLabel scopeNote }
-  }
-}
-```
-```graphql
-# Example for the "Virtuele Thesaurus voor Mode en Kostuums"
-
-query {
-     terms(match:"overjas" dataset:[ "vtmk"] ) {
-    dataset label terms { uri prefLabel scopeNote altLabel broader narrower}
-  } 
-}
-```
-```graphql
-# Example queries for the Erfgeo connector (default type hg:Place)
-
-query {
-  terms(match:"Hoorn" dataset:[ "erfgeo"] ) {
     dataset
     label
-    terms { uri prefLabel altLabel related }
-  } 
+    terms {
+      uri
+      prefLabel
+      altLabel
+      definition
+      scopeNote
+    }
+  }
+}
+
+# Stichting Omroep Muziek Termen
+query {
+  terms(match:"cello" dataset:["som"] ) {
+    dataset
+    label
+    terms {
+      uri
+      prefLabel
+      scopeNote
+    }
+  }
+}
+
+# Virtuele Thesaurus voor Mode en Kostuums
+query {
+  terms(match:"overjas" dataset:["vtmk"] ) {
+    dataset
+    label
+    terms {
+      uri
+      prefLabel
+      scopeNote
+      altLabel
+      broader
+      narrower
+    }
+  }
+}
+
+# Erfgeo (default type hg:Place)
+query {
+  terms(match:"Hoorn" dataset:["erfgeo"] ) {
+    dataset
+    label
+    terms {
+      uri
+      prefLabel
+      altLabel
+      related
+    }
+  }
 }
 
 query {
-  terms(match:"Zardam" dataset:[ "erfgeo"] ) {
+  terms(match:"Zardam" dataset:["erfgeo"] ) {
     dataset
     label
-    terms { uri prefLabel altLabel related }
-  } 
+    terms {
+      uri
+      prefLabel
+      altLabel
+      related
+    }
+  }
 }
-```
-```graphql
-# And additional support for the hg:Street type 
+
+# And additional support for the hg:Street type
 # using 'erfgeo:street' as dataset name
 # add defintions in /conf/termennetwerk.xml to add other types
 query {
-  terms(match:"Begijnhof" dataset:[ "erfgeo:street"] ) {
+  terms(match:"Begijnhof" dataset:["erfgeo:street"] ) {
     dataset
     label
-    terms { uri prefLabel altLabel related }
-  } 
+    terms {
+      uri
+      prefLabel
+      altLabel
+      related
+    }
+  }
 }
 
 query {
-  terms(match:"dam, middelburg" dataset:[ "erfgeo:street"] ) {
+  terms(match:"dam" dataset:["erfgeo:street"] ) {
     dataset
     label
-    terms { uri prefLabel altLabel related }
-  } 
+    terms {
+      uri
+      prefLabel
+      altLabel
+      related
+    }
+  }
 }
-```
-```graphql
-# Basic support for the all the AdamLink concepts 
+
+# Basic support for the all the AdamLink concepts
 query {
   terms(match:"Joden Breestraat" dataset:["adamlink"] ) {
     dataset
     label
-    terms { uri prefLabel altLabel scopeNote }
-  } 
+    terms {
+      uri
+      prefLabel
+      altLabel
+      scopeNote
+    }
+  }
+}
+
+# RKDartists
+query {
+  terms(match:"rembrandt" dataset:["rkdartists"] ) {
+    dataset
+    label
+    terms {
+      uri
+      prefLabel
+      scopeNote
+      altLabel
+    }
+  }
+}
+
+# Archeologisch Basisregister (ABR)
+query {
+  terms(match:"bezemstreek" dataset:["abr"] ) {
+    dataset
+    label
+    terms {
+      uri
+      prefLabel
+      scopeNote
+      altLabel
+      broader
+      narrower
+    }
+  }
 }
 ```
+
 or via curl:
 
 ```sh
-$ curl -XPOST -H 'Content-Type:application/graphql'  -d 'query { terms(match:"Abkhazian",dataset:["clavas"]) { dataset terms {uri, altLabel} } }' http://localhost:8080/nde/graphql
+$ curl -XPOST \
+  -H 'Content-Type:application/graphql' \
+  -d 'query { terms(match:"Abkhazian" dataset:["clavas"]) { dataset terms {uri, altLabel} } }' \
+  http://localhost:8080/nde/graphql
 ```
 
 ## TODO
