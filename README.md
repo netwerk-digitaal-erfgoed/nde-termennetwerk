@@ -239,6 +239,35 @@ query {
     }
   }
 }
+
+# Muziekstijlen (Muziekweb)
+query {
+  terms(match:"Viool" dataset:["mwmuziekstijlen"] ) {
+    dataset
+    label
+    terms {
+      uri
+      prefLabel
+      scopeNote
+      broader
+      narrower
+    }
+  }
+}
+
+# Artiesten, componisten en uitvoerenden (Muziekweb)
+query {
+  terms(match:"Boeijen" dataset:["mwartiesten"] ) {
+    dataset
+    label
+    terms {
+      uri
+      prefLabel
+      altLabel
+      scopeNote
+    }
+  }
+}
 ```
 
 or via curl:
