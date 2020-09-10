@@ -240,9 +240,9 @@ query {
   }
 }
 
-# Muziekstijlen (Muziekweb)
+# Muziek: genres en stijlen (Muziekweb)
 query {
-  terms(match:"Viool" dataset:["mwmuziekstijlen"] ) {
+  terms(match:"Viool" dataset:["mwgenresstijlen"] ) {
     dataset
     label
     terms {
@@ -255,9 +255,9 @@ query {
   }
 }
 
-# Artiesten, componisten en uitvoerenden (Muziekweb)
+# Muziek: personen en groepen
 query {
-  terms(match:"Boeijen" dataset:["mwartiesten"] ) {
+  terms(match:"Boeijen" dataset:["mwpersonengroepen"] ) {
     dataset
     label
     terms {
