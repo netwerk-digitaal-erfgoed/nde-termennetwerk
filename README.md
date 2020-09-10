@@ -255,7 +255,7 @@ query {
   }
 }
 
-# Muziek: personen en groepen
+# Muziek: personen en groepen (Muziekweb)
 query {
   terms(match:"Boeijen" dataset:["mwpersonengroepen"] ) {
     dataset
