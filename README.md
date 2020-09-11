@@ -239,6 +239,35 @@ query {
     }
   }
 }
+
+# Muziek: genres en stijlen (Muziekweb)
+query {
+  terms(match:"Viool" dataset:["mwgenresstijlen"] ) {
+    dataset
+    label
+    terms {
+      uri
+      prefLabel
+      scopeNote
+      broader
+      narrower
+    }
+  }
+}
+
+# Muziek: personen en groepen (Muziekweb)
+query {
+  terms(match:"Boeijen" dataset:["mwpersonengroepen"] ) {
+    dataset
+    label
+    terms {
+      uri
+      prefLabel
+      altLabel
+      scopeNote
+    }
+  }
+}
 ```
 
 or via curl:
