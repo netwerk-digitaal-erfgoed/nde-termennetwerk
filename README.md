@@ -1,4 +1,8 @@
-# NDE - Termennetwerk (pilot)
+# ⚠️ This repository is archived
+
+## A new Network of Terms application is available in [network-of-terms-api](https://github.com/netwerk-digitaal-erfgoed/network-of-terms-api).
+
+## NDE - Termennetwerk (pilot)
 
 Pilot implementation for the [NDE Termennetwerk](https://docs.google.com/document/d/11CLVYri6B1h4tHShhEmYYJB-y-bmS5cm3E5e7hZJLiQ/edit?usp=sharing) created for the [CLARIAH Techdag November 30, 2018](https://www.clariah.nl/evenementen/tech-dag-2-2018).
 
